@@ -10,4 +10,7 @@ bot = telebot.TeleBot(os.environ.get('TELEGRAM_BOT_TOKEN'))
 if settings.DEBUG:
     start_bot.delay()
 else:
-    bot.set_webhook(url=constants.TELEGRAM_BOT_URL)
+    try:
+        bot.set_webhook(url=constants.TELEGRAM_BOT_URL)
+    except:
+        pass
