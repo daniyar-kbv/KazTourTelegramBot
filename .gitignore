@@ -90,6 +90,5 @@ db.sqlite3
 .idea/
 myenv/
 .vscode/
-media/
 backups/
 static/
