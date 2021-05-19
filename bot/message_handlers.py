@@ -7,6 +7,7 @@ import constants
 
 @bot.message_handler(commands=['start', 'restart'])
 def handle_start(message):
+    print('asd')
     user = auth.auth_user(message)
     user.current_step = constants.STEP_GREETING
     user.save()
