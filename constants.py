@@ -1,4 +1,5 @@
-TELEGRAM_BOT_URL = 'https://telegram-bot.kaztour.kz/main/bot/'
+# TELEGRAM_BOT_URL = 'https://telegram-bot.kaztour.kz/main/bot/'
+TELEGRAM_BOT_URL = 'https://api.24goalsapp.com/botbot_test/main/bot/'
 
 STEP_GREETING = 1
 STEP_AUDIO_OR_TEXT = 2
