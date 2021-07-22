@@ -1,12 +1,28 @@
 from django.db import models
 from django.db import connection
-from django.contrib.auth.models import User
 from django.conf import settings
 from typing import Optional
 from utils.general import get_choice_value
 import constants
 import datetime
-import os
+
+
+class OrderedModel(models.Model):
+    my_order = models.PositiveIntegerField('Сортировка', default=0, blank=False, null=False)
+
+    class Meta:
+        ordering = ['my_order']
+        abstract = True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.my_order == 0:
+            largest_order = self.__class__.objects.order_by('-my_order').first()
+            if largest_order:
+                self.my_order = largest_order.my_order + 1
+            else:
+                self.my_order = 1
+        super(OrderedModel, self).save(force_insert, force_update, using, update_fields)
 
 
 class TelegramUser(models.Model):
@@ -55,6 +71,8 @@ class TelegramUser(models.Model):
         if last_data:
             last_data.audio_suggestion = data_text
             last_data.save()
+        else:
+            UserData.objects.create(user=self, audio_suggestion=data_text)
 
     def get_last_audio_text(self):
         last_data = UserData.objects.filter(user=self).last()
@@ -73,7 +91,7 @@ class UserData(models.Model):
         related_name='datas',
     )
     contact_type = models.CharField('Способ контакта', max_length=100, null=True)
-    answers = models.TextField('Текст')
+    answers = models.TextField('Текст', null=True, blank=True)
     audio_suggestion = models.TextField('Переведенное аудио', null=True, blank=True)
     start_date = models.DateTimeField('Дата начала', auto_now_add=True)
     end_date = models.DateTimeField('Дата окончания', null=True, blank=True)
@@ -86,20 +104,18 @@ class UserData(models.Model):
         return f'{self.user.username}: {self.start_date}'
 
 
-class SurveyQuestion(models.Model):
+class SurveyQuestion(OrderedModel):
     text = models.TextField('Текст')
-    my_order = models.PositiveIntegerField('Сортировка', default=0, blank=False, null=False)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = 'Вопрос опроса'
         verbose_name_plural = 'Вопросы опроса'
-        ordering = ['my_order']
 
     def __str__(self):
         return self.text
 
 
-class QuestionAnswer(models.Model):
+class QuestionAnswer(OrderedModel):
     question = models.ForeignKey(
         SurveyQuestion,
         on_delete=models.CASCADE,
@@ -109,26 +125,22 @@ class QuestionAnswer(models.Model):
     )
     text = models.TextField('Текст')
     is_own_option = models.BooleanField('Свой вариант', default=False)
-    my_order = models.PositiveIntegerField('Сортировка', default=0, blank=False, null=False)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = 'Ответ на вопрос'
         verbose_name_plural = 'Ответы на вопрос'
-        ordering = ['my_order']
 
     def __str__(self):
         return self.text
 
 
-class BotText(models.Model):
+class BotText(OrderedModel):
     id = models.PositiveSmallIntegerField(primary_key=True, choices=constants.TEXT_ALL)
     text = models.TextField('Текст', null=True, blank=True)
-    my_order = models.PositiveIntegerField('Сортировка', default=0, blank=False, null=False)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = 'Текст бота'
         verbose_name_plural = 'Текста бота'
-        ordering = ['my_order']
 
     def __str__(self):
         return get_choice_value(self.id, constants.TEXT_ALL)
@@ -142,10 +154,10 @@ class BotText(models.Model):
             return None
 
 
-class ContactType(models.Model):
+class ContactType(OrderedModel):
     text = models.CharField('Надпись', max_length=100)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = 'Способ связи'
         verbose_name_plural = 'Способы связи'
 
@@ -157,11 +169,42 @@ class ContactType(models.Model):
         return list(map(lambda contact_type: contact_type.text, ContactType.objects.all()))
 
 
-if 'main_bottext' in connection.introspection.table_names():
-    for index, text in enumerate(constants.TEXT_ALL):
-        try:
-            BotText.objects.get(id=text[0])
-        except:
-            obj = BotText.objects.create(id=text[0])
-            obj.my_order = index
-            obj.save()
+class DefaultDataManager:
+    @staticmethod
+    def create_default_data():
+        DefaultDataManager._create_bot_texts()
+        DefaultDataManager._create_contact_types()
+        DefaultDataManager._create_questions()
+
+    @staticmethod
+    def _create_bot_texts():
+        if 'main_bottext' in connection.introspection.table_names():
+            for index, text in enumerate(constants.TEXT_ALL):
+                try:
+                    BotText.objects.get(id=text[0])
+                except:
+                    obj: BotText = BotText.objects.create(id=text[0])
+                    obj.text = get_choice_value(text[0], constants.DEFAULT_TEXT_ALL)
+                    obj.save()
+
+    @staticmethod
+    def _create_contact_types():
+        if 'main_contacttype' in connection.introspection.table_names():
+            if ContactType.objects.count() == 0:
+                for index, contact in enumerate(constants.DEFAULT_CONTACT_TYPES):
+                    contact: ContactType = ContactType.objects.create(text=contact)
+                    contact.save()
+
+    @staticmethod
+    def _create_questions():
+        if 'main_surveyquestion' in connection.introspection.table_names():
+            if SurveyQuestion.objects.count() == 0:
+                question = SurveyQuestion.objects.create(text=constants.DEFAULT_QUESTION)
+                for index, answer_text in enumerate(constants.DEFAULT_ANSWERS):
+                    answer = QuestionAnswer.objects.create(question=question, text=answer_text)
+                    if answer_text == constants.DEFAULT_ANSWER_4:
+                        answer.is_own_option = True
+                    answer.save()
+
+
+DefaultDataManager.create_default_data()

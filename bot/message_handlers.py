@@ -10,7 +10,7 @@ def handle_start(message):
     user = auth.auth_user(message)
     user.current_step = constants.STEP_GREETING
     user.save()
-    greeting.send_greetings(message, user)
+    greeting.send_greetings(user)
 
 
 @bot.message_handler(content_types=['text'])

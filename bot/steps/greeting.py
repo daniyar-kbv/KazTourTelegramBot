@@ -7,7 +7,7 @@ import constants
 import time
 
 
-def send_greetings(message: types.Message, user: TelegramUser):
+def send_greetings(user: TelegramUser):
     markup = keyboard.create_regular_keyboard([BotText.get_text(constants.TEXT_GREENING_OPTION_1),
                                                BotText.get_text(constants.TEXT_GREENING_OPTION_2)])
     messages.send_messages([constants.TEXT_GREENING_1,

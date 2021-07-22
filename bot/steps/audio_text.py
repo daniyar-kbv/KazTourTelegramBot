@@ -1,5 +1,5 @@
 from main.models import TelegramUser, BotText
-from bot.settings import bot
+from bot.settings import bot, recognizer
 from bot.steps import contacts
 from bot.utils import messages, keyboard
 from telebot import types
@@ -9,8 +9,7 @@ import time
 
 def translate_to_text(message: types.Message):
     bot.send_chat_action(message.chat.id, 'typing')
-    time.sleep(5)
-    return 'abrakadabra'
+    return recognizer.recognize_speech(message)
 
 
 def start_audio(user: TelegramUser):
