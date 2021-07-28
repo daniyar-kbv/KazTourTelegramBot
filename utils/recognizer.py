@@ -15,13 +15,18 @@ class Recognizer:
         self.__bot = bot
 
     def recognize_speech(self, message: Message) -> Optional[str]:
+        print('saving audio file')
         self.__save_audio(message)
 
+        print(f'message.voice.duration: {message.voice.duration}')
         if message.voice.duration >= 30:
+            print('long audio')
             text = self.__recognize_long_voice(message)
         else:
+            print('short audio')
             text = self.__recognize_short_voice(message)
 
+        print('deleting audio file')
         self.__delete_audio(message)
 
         return text

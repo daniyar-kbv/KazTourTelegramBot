@@ -7,20 +7,25 @@ import os
 
 class RecognitionService:
     def send_short_audio(self, file_path: str) -> Optional[str]:
+        print(f'reading file: {file_path}')
         with open(file_path, 'rb') as f:
             data = f.read()
 
         params = {
             'profanityFilter': True
         }
+        print(f'creating params: {params}')
 
+        print('sending request')
         response = requests.post(
             constants.YANDEX_RECOGNITION_SHORT_AUDIO_URL,
             data=data,
             params=params,
             headers=self.__get_headers())
-
-        return response.json().get('result')
+        print(f'got response: {response.json()}')
+        results = response.json().get('result')
+        print(f'returning result: {results}')
+        return results
 
     def send_long_audio(self, file_name: str) -> Optional[str]:
         params = {
@@ -78,6 +83,8 @@ class RecognitionService:
         return ''
 
     def __get_headers(self) -> dict:
-        return {
+        headers = {
             'Authorization': f'Api-Key {os.environ.get("API_SECRET")}'
         }
+        print(f'creating headers: {headers}')
+        return headers

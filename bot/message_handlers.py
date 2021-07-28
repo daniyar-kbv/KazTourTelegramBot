@@ -31,6 +31,8 @@ def get_text_messages(message):
 
 @bot.message_handler(content_types=['voice'])
 def get_voice_messages(message):
+    print('received voice message')
     user = auth.auth_user(message)
+    print(f'user authenticated: {user.username}')
     audio_text.handle_audio(message, user)
 

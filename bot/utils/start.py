@@ -1,11 +1,10 @@
-from django.conf import settings
 from telebot import TeleBot
 from main.tasks import start_bot
 import constants
 
 
-def start(bot: TeleBot):
-    if settings.DEBUG:
+def start(bot: TeleBot, debug: bool):
+    if debug:
         start_bot.delay()
     else:
         try:

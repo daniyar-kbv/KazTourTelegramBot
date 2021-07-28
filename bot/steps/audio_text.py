@@ -8,6 +8,7 @@ import time
 
 
 def translate_to_text(message: types.Message):
+    print('sending typing chat action')
     bot.send_chat_action(message.chat.id, 'typing')
     return recognizer.recognize_speech(message)
 
@@ -20,6 +21,7 @@ def start_audio(user: TelegramUser):
 
 
 def handle_audio(message: types.Message, user: TelegramUser):
+    print(f'current step: {user.current_sub_step}')
     if user.current_sub_step == constants.SUB_STEP_AUDIO_START:
         if message.content_type == 'text':
             user.create_data(message.text)
@@ -27,8 +29,10 @@ def handle_audio(message: types.Message, user: TelegramUser):
             user.save()
             contacts.start_contacts(message, user)
         elif message.content_type == 'voice':
+            print(f'message.content_type: {message.content_type}')
             user.current_sub_step = constants.SUB_STEP_AUDIO_ACCEPT
             user.save()
+            print(f'new current step: user.current_sub_step')
             translated_text = translate_to_text(message)
             user.add_audio(translated_text)
             markup = keyboard.create_regular_keyboard([BotText.get_text(constants.TEXT_AUDIO_YES),
