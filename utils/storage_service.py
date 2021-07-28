@@ -1,10 +1,14 @@
 import constants
 import boto3
+import os
 
 
 class StorageService:
     session = boto3.session.Session()
     s3 = session.client(
+        aws_access_key_id=os.environ.get('STATIC_KEY'),
+        aws_secret_access_key=os.environ.get('STATIC_SECRET'),
+        region_name='ru-central1',
         service_name='s3',
         endpoint_url='https://storage.yandexcloud.net'
     )
