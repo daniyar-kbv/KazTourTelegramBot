@@ -37,7 +37,7 @@ services:
       python manage.py migrate &&
       python manage.py collectstatic --no-input --clear &&
       python manage.py createsuperuser --no-input || true &&
-      gunicorn kaztour_bot.wsgi:application --bind 0.0.0.0:8990"
+      python manage.py runserver 0:8990"
     volumes:
       - .:/kaztour_bot
       - static_volume:/kaztour_bot/static
