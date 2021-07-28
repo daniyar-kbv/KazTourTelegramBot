@@ -45,19 +45,25 @@ class RecognitionService:
             json=params,
             headers=self.__get_headers())
 
+        print(f'response: {response.json()}')
+
         if response.json().get('code') is not None:
             print('Send long audio error:')
             print(response.json().get('message'))
             return None
 
         operation_id = response.json().get('id')
-        return self.__get_results(operation_id)
+        results = self.__get_results(operation_id)
+        print(f'results: {results}')
+        return results
 
     def __get_results(self, operation_id: str) -> str:
         response = requests.get(
             constants.YANDEX_RECOGNITION_RESULTS_URL.format(operation_id=operation_id),
             headers=self.__get_headers()
         )
+
+        print(f'results response: {response.json()}')
 
         response_json = response.json()
         if response_json:
