@@ -42,7 +42,10 @@ class Recognizer:
         return text
 
     def __get_audio(self, message: Message) -> bytes:
+        print('getting file info')
         file_info = self.__bot.get_file(message.voice.file_id)
+        print(f'file info: {file_info}')
+        print('downloading file')
         return self.__bot.download_file(file_info.file_path)
 
     def __get_file_name(self, message: Message) -> str:
@@ -52,9 +55,12 @@ class Recognizer:
         return f'tmp/{self.__get_file_name(message)}'
 
     def __save_audio(self, message: Message):
+        print('getting audio file')
         downloaded_file = self.__get_audio(message)
+        print(f'saving downloaded file: {downloaded_file}')
         with open(f'{self.__get_file_path(message)}', 'wb') as new_file:
             new_file.write(downloaded_file)
+        print(f'saved downloaded file to: {new_file}')
 
     def __delete_audio(self, message):
         os.system(f'rm {self.__get_file_path(message)}')
