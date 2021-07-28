@@ -19,6 +19,5 @@ def send_crm_data(user_id):
     except:
         return
     serializer = TelegramUserSerializer(user)
-    print(serializer.data)
-    response = requests.post(url=f'{constants.KAZTOUR_CRM_URL}?crm_verify_token={os.environ.get("CRM_VERIFY_TOKEN")}',
-                             json=serializer.data)
+    requests.post(url=f'{constants.KAZTOUR_CRM_URL}?crm_verify_token={os.environ.get("CRM_VERIFY_TOKEN")}',
+                  json=serializer.data)

@@ -7,24 +7,20 @@ import os
 
 class RecognitionService:
     def send_short_audio(self, file_path: str) -> Optional[str]:
-        print(f'reading file: {file_path}')
         with open(file_path, 'rb') as f:
             data = f.read()
 
         params = {
             'profanityFilter': True
         }
-        print(f'creating params: {params}')
 
-        print('sending request')
         response = requests.post(
             constants.YANDEX_RECOGNITION_SHORT_AUDIO_URL,
             data=data,
             params=params,
             headers=self.__get_headers())
-        print(f'got response: {response.json()}')
+
         results = response.json().get('result')
-        print(f'returning result: {results}')
         return results
 
     def send_long_audio(self, file_name: str) -> Optional[str]:
@@ -45,8 +41,6 @@ class RecognitionService:
             json=params,
             headers=self.__get_headers())
 
-        print(f'response: {response.json()}')
-
         if response.json().get('code') is not None:
             print('Send long audio error:')
             print(response.json().get('message'))
@@ -54,7 +48,6 @@ class RecognitionService:
 
         operation_id = response.json().get('id')
         results = self.__get_results(operation_id)
-        print(f'results: {results}')
         return results
 
     def __get_results(self, operation_id: str) -> str:
@@ -62,8 +55,6 @@ class RecognitionService:
             constants.YANDEX_RECOGNITION_RESULTS_URL.format(operation_id=operation_id),
             headers=self.__get_headers()
         )
-
-        print(f'results response: {response.json()}')
 
         response_json = response.json()
         if response_json:
@@ -84,7 +75,7 @@ class RecognitionService:
                         return '. '.join(texts)
                 return ''
             else:
-                time.sleep(2)
+                time.sleep(5)
                 return self.__get_results(operation_id)
         return ''
 
@@ -92,5 +83,4 @@ class RecognitionService:
         headers = {
             'Authorization': f'Api-Key {os.environ.get("API_SECRET")}'
         }
-        print(f'creating headers: {headers}')
         return headers
