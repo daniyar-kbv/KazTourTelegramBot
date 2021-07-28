@@ -57,7 +57,7 @@ class Recognizer:
     def __save_audio(self, message: Message):
         print('getting audio file')
         downloaded_file = self.__get_audio(message)
-        print(f'saving downloaded file: {downloaded_file}')
+        print('saving downloaded file')
         with open(f'{self.__get_file_path(message)}', 'wb') as new_file:
             new_file.write(downloaded_file)
         print(f'saved downloaded file to: {new_file}')

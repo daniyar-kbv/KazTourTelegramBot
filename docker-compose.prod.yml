@@ -40,6 +40,9 @@ services:
       gunicorn kaztour_bot.wsgi:application --bind 0.0.0.0:8990"
     volumes:
       - .:/kaztour_bot
+      - static_volume:/kaztour_bot/static
+      - media_volume:/kaztour_bot/media
+      - tmp_volume:/kaztour_bot/tmp
     ports:
       - "8990:8990"
     depends_on:
@@ -54,4 +57,5 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+  tmp_volume:
   rabbit:

@@ -36,6 +36,8 @@ services:
       python manage.py runserver 0:8990"
     volumes:
       - .:/kaztour_bot
+      - media_volume:/kaztour_bot/media
+      - tmp_volume:/kaztour_bot/tmp
     ports:
       - "8990:8990"
     depends_on:
@@ -48,4 +50,6 @@ services:
 
 volumes:
   postgres_data:
+  media_volume:
+  tmp_volume:
   rabbit:
