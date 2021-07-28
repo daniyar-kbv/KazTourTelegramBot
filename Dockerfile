@@ -20,8 +20,9 @@ RUN chmod +x /wait
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 RUN unzip awscliv2.zip
-ADD .aws/credentials ~/.aws/credentials
-ADD .aws/config ~/.aws/config
+RUN sudo ./aws/install
+ADD .aws/credentials ~/.aws/
+ADD .aws/config ~/.aws/
 
 COPY ./entrypoint.sh .
 ENTRYPOINT ["./entrypoint.sh"]
