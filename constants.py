@@ -61,7 +61,7 @@ TEXT_ALL = [
 ]
 
 DEFAULT_TEXT_GREENING_1 = 'Привет, {}! Спасибо что обратились к виртуальному помощнику "KAZTOUR"'
-DEFAULT_TEXT_GREENING_2 = 'Ответьте на 5 вопросов о путешествии и менеджер индивидуально подберет для вас тур👍'
+DEFAULT_TEXT_GREENING_2 = 'Ответьте на несколько вопросов о путешествии и менеджер индивидуально подберет для вас тур👍'
 DEFAULT_TEXT_GREENING_3 = 'Или отправьте нам аудио или текст с вашими пожеланиями! На пример: "Хочу поехать в египет ' \
                           'с семьей в следующем месяце на неделю"'
 DEFAULT_TEXT_GREENING_4 = 'Выберите опцию👇'
@@ -129,3 +129,10 @@ YANDEX_RECOGNITION_SHORT_AUDIO_URL = 'https://stt.api.cloud.yandex.net/speech/v1
 YANDEX_RECOGNITION_LONG_AUDIO_URL = 'https://transcribe.api.cloud.yandex.net/speech/stt/v2/longRunningRecognize'
 YANDEX_RECOGNITION_RESULTS_URL = 'https://operation.api.cloud.yandex.net/operations/{operation_id}'
 YANDEX_STORAGE_BUCKET_URL = 'https://storage.yandexcloud.net/{bucket_name}/{file_path}'
+
+BOT_MODE_VOICE_RECOGNITION = 1
+BOT_MODES = [
+    (BOT_MODE_VOICE_RECOGNITION, 'Режим аудио сообщений')
+]
+
+DEFAULT_VOICE_RECOGNITION_ENABLED = '0'

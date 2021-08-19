@@ -19,3 +19,7 @@ class TelegramUserSerializer(serializers.ModelSerializer):
 
     def get_contact_type(self, obj):
         return obj.get_last_data().contact_type
+
+
+class VoiceRecoginitionSerializer(serializers.Serializer):
+    enabled = serializers.BooleanField()

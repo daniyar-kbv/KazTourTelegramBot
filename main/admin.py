@@ -1,6 +1,6 @@
 from django.contrib import admin
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
-from main.models import TelegramUser, QuestionAnswer, SurveyQuestion, BotText, ContactType, UserData
+from main.models import TelegramUser, QuestionAnswer, SurveyQuestion, BotText, ContactType, UserData, BotMode
 from main.forms import QuestionAnswerForm, SurveyQuestionForm, BotTextForm
 
 
@@ -46,6 +46,18 @@ class TelegramUserAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'current_step', 'current_sub_step',
                        'current_micro_step']
     inlines = [UserDataInline]
+
+# Uncomment if multiple modes exist
+# @admin.register(BotMode)
+# class BotModeAdmin(admin.ModelAdmin):
+#     list_display = ['type', 'is_enabled']
+#     readonly_fields = ['type']
+#
+#     def has_add_permission(self, request):
+#         return False
+#
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
 
 admin.site.site_header = 'Администрирование Kaztour Telegram Bot'

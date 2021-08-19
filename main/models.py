@@ -169,12 +169,39 @@ class ContactType(OrderedModel):
         return list(map(lambda contact_type: contact_type.text, ContactType.objects.all()))
 
 
+class BotMode(models.Model):
+    type = models.PositiveSmallIntegerField('Тип',
+                                            choices=constants.BOT_MODES,
+                                            null=False,
+                                            blank=False)
+    is_enabled = models.BooleanField('Включен',
+                                     default=False)
+
+    class Meta:
+        verbose_name = 'Режим бота'
+        verbose_name_plural = 'Режимы бота'
+
+    def __str__(self):
+        return get_choice_value(self.type, constants.BOT_MODES)
+
+    @staticmethod
+    def get_mode_of_type(type: int):
+        mode = None
+        try:
+            mode = BotMode.objects.get(type=type)
+        except:
+            pass
+        return mode
+
+
+
 class DefaultDataManager:
     @staticmethod
     def create_default_data():
         DefaultDataManager._create_bot_texts()
         DefaultDataManager._create_contact_types()
         DefaultDataManager._create_questions()
+        DefaultDataManager._create_modes()
 
     @staticmethod
     def _create_bot_texts():
@@ -189,22 +216,32 @@ class DefaultDataManager:
 
     @staticmethod
     def _create_contact_types():
-        if 'main_contacttype' in connection.introspection.table_names():
-            if ContactType.objects.count() == 0:
-                for index, contact in enumerate(constants.DEFAULT_CONTACT_TYPES):
-                    contact: ContactType = ContactType.objects.create(text=contact)
-                    contact.save()
+        if 'main_contacttype' in connection.introspection.table_names() and \
+                ContactType.objects.count() == 0:
+            for index, contact in enumerate(constants.DEFAULT_CONTACT_TYPES):
+                contact: ContactType = ContactType.objects.create(text=contact)
+                contact.save()
 
     @staticmethod
     def _create_questions():
-        if 'main_surveyquestion' in connection.introspection.table_names():
-            if SurveyQuestion.objects.count() == 0:
-                question = SurveyQuestion.objects.create(text=constants.DEFAULT_QUESTION)
-                for index, answer_text in enumerate(constants.DEFAULT_ANSWERS):
-                    answer = QuestionAnswer.objects.create(question=question, text=answer_text)
-                    if answer_text == constants.DEFAULT_ANSWER_4:
-                        answer.is_own_option = True
-                    answer.save()
+        if 'main_surveyquestion' in connection.introspection.table_names() and \
+                SurveyQuestion.objects.count() == 0:
+            question = SurveyQuestion.objects.create(text=constants.DEFAULT_QUESTION)
+            for index, answer_text in enumerate(constants.DEFAULT_ANSWERS):
+                answer = QuestionAnswer.objects.create(question=question, text=answer_text)
+                if answer_text == constants.DEFAULT_ANSWER_4:
+                    answer.is_own_option = True
+                answer.save()
+
+    @staticmethod
+    def _create_modes():
+        if 'main_botmode' in connection.introspection.table_names() and \
+                BotMode.objects.count() == 0:
+            for index, mode in enumerate(constants.BOT_MODES):
+                try:
+                    BotMode.objects.get(type=mode[0])
+                except:
+                    BotMode.objects.create(type=mode[0])
 
 
 DefaultDataManager.create_default_data()
